@@ -49,10 +49,13 @@ class InstallerLayoutTests(unittest.TestCase):
         # so the test does not depend on a previous packaging run.
         self.release = RELEASE_DLL
         if not os.path.exists(self.release):
-            result = subprocess.run(
-                ["bash", os.path.join(REPO, "scripts", "package-mod.sh"), "--offline"],
-                capture_output=True, text=True, timeout=900,
-            )
+            # Not always --offline: a fresh clone has no package cache, and asking
+            # for one offline would fail for a reason that has nothing to do with
+            # this test.  Set FOCUSED_OFFLINE=1 on a machine without network.
+            package = ["bash", os.path.join(REPO, "scripts", "package-mod.sh")]
+            if os.environ.get("FOCUSED_OFFLINE") == "1":
+                package.append("--offline")
+            result = subprocess.run(package, capture_output=True, text=True, timeout=900)
             if not os.path.exists(self.release):
                 self.skipTest("no release DLL and packaging failed: " + result.stderr[-300:])
 

@@ -121,5 +121,43 @@ class ModRepositoryTests(unittest.TestCase):
         self.assertIn("两个", readme)                # do not keep two copies of the DLL
 
 
+class ReadmeLinkTests(unittest.TestCase):
+    """Links in the READMEs have to point at something.
+
+    A generation bug once rewrote ](../../LICENSE) into ]((LICENSE), which broke
+    every badge on the repository front page: the badge rendered and the literal
+    "](LICENSE)" appeared next to it.  Nothing failed -- there is no build step for
+    markdown -- so it gets checked here.
+    """
+
+    READMES = ("README.md", "README.en.md")
+
+    def test_no_double_opening_parenthesis(self):
+        for name in self.READMES:
+            with open(os.path.join(REPO, name), encoding="utf-8") as handle:
+                text = handle.read()
+            self.assertNotRegex(
+                text, r"\]\(\(",
+                "%s contains ']((', which is what a broken relative-link rewrite looks like" % name,
+            )
+
+    def test_every_relative_link_resolves(self):
+        import re
+
+        pattern = re.compile(r"!?\[[^\]]*\]\(([^)\s]+)")
+        missing = []
+        for name in self.READMES:
+            with open(os.path.join(REPO, name), encoding="utf-8") as handle:
+                text = handle.read()
+            for target in pattern.findall(text):
+                if target.startswith(("http://", "https://", "#", "mailto:")):
+                    continue
+                path = os.path.join(REPO, target.split("#")[0])
+                if not os.path.exists(path):
+                    missing.append("%s -> %s" % (name, target))
+
+        self.assertEqual([], missing, "links that point at nothing: %s" % missing)
+
+
 if __name__ == "__main__":
     unittest.main()
