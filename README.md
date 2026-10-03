@@ -6,8 +6,8 @@
 [![Platform: Linux / Proton](https://img.shields.io/badge/Platform-Linux%20%2F%20Proton-blue.svg)](#系统要求)
 [![BepInEx](https://img.shields.io/badge/BepInEx-5.x%20(not%206.0)-green.svg)](https://github.com/BepInEx/BepInEx)
 
-一个用于《[放松时光：与你共享 Lo-Fi 故事](https://store.steampowered.com/app/3548580/)》的 BepInEx 插件：
-**开启创作模式时冻结黑名单中的进程，创作模式结束后恢复进程。**
+《[放松时光：与你共享 Lo-Fi 故事](https://store.steampowered.com/app/3548580/)》的 BepInEx 插件。
+游戏创作模式运行期间，挂起（冻结）屏蔽名单中列出的进程；创作模式结束后恢复。
 
 <img src="packaging/thunderstore/icon.png" alt="ChillFocused" width="128">
 
@@ -17,39 +17,38 @@
 
 | 功能 | 说明 |
 |---|---|
-| 跟随游戏计时 | 番茄钟的**专注阶段**冻结、**休息阶段自动恢复**；正计时同理 |
-| 进程名单 | 按进程名（支持 `*` `?`）或**启动参数子串**匹配；面板里从运行中的进程点选 |
-| 保护名单 | 内置 450+ 条护栏（合成器、终端、输入法、wine、游戏本体…），只增不减 |
-| 三语言界面 | 跟随游戏语言：简体中文 / English / 日本語（文案可覆盖） |
-| 面板 HUD | `F9` 切换三种形态（一行 / 详细 / 关闭），`F7` 设置面板，`F8` 立即扫描 |
-| 可调界面 | 面板布局是纯文本文件，改完保存 1 秒生效，**不用重启游戏** |
-| 演练模式 | 「只记录，不冻结」：先看清会命中谁再启用 |
-| 崩溃兜底 | 插件停止心跳 → 后端租约到期 → 自动全部恢复；后端被杀也有 `--thaw-all` |
+| 跟随游戏计时 | 番茄钟在专注阶段冻结、休息阶段恢复；正向计时同理 |
+| 进程匹配 | 按进程名（支持 `*`、`?` 通配符）或启动参数子串匹配；可在面板中从运行中的进程选择 |
+| 保护名单 | 内置 446 条保护项（桌面合成器、终端、输入法、Wine、游戏本体等），仅可追加 |
+| 界面语言 | 简体中文 / English / 日本語，默认跟随游戏的语言设置；每条文案均可覆盖 |
+| 状态面板 | `F9` 循环切换三种形态（单行、详细、关闭），`F7` 打开设置面板，`F8` 立即扫描 |
+| 可调布局 | 面板布局保存为纯文本文件，修改后 1 秒内生效，无需重启游戏 |
+| 只记录，不冻结 | 仅记录将被命中的进程，不执行冻结（`DryRun`） |
+| 故障恢复 | 插件停止心跳后，后端租约到期并恢复全部进程；后端被终止时可用 `--thaw-all` 恢复 |
 
 ## 系统要求
 
-| 平台 | 状态 |
-|---|---|
-| **Linux + Steam / Proton** | ✅ **支持**（本项目就是为它写的，宿主侧后端只用 Linux 的 `/proc`、cgroup v2、`SIGSTOP`） |
-| Windows | ⚠️ 插件本身能加载，但**后端没有 Windows 实现**，因此不生效 |
-| macOS | ❌ 未测试 |
+| 平台 | 状态 | 说明 |
+|---|---|---|
+| Linux + Steam / Proton | 支持 | 宿主侧后端依赖 Linux 的 `/proc`、cgroup v2 与 `SIGSTOP` |
+| Windows | 不支持 | 插件可正常加载，但后端没有 Windows 实现，因此不会生效 |
+| macOS | 未测试 | — |
 
-还需要：
+依赖：
 
-- **BepInEx 5.x**（`BepInEx_win_x64_5.4.23.5.zip`；**不要用 6.0**，本插件按 5.x 的 API 写）
-- 宿主侧安装 **Focused** 后端（见下）
+- BepInEx 5.x（`BepInEx_win_x64_5.4.23.5.zip`）。不支持 BepInEx 6.0：本插件按 5.x 的 API 编写。
+- 宿主侧 Focused 后端，见「安装」第 4 步。
 
 ## 安装
 
-### 1. 装 BepInEx
+### 1. 安装 BepInEx
 
 下载 [BepInEx 5.4.23.5 (win x64)](https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.5/BepInEx_win_x64_5.4.23.5.zip)，
-解压到**游戏根目录**（就是有 `Chill With You.exe` 的那层），然后**先启动一次游戏**，
-让它生成 `BepInEx/` 目录。
+解压到游戏根目录（包含 `Chill With You.exe` 的目录），启动游戏一次以生成 `BepInEx/` 目录。
 
-### 2. 装载 DLL
+### 2. 安装插件
 
-从 [Releases](https://github.com/CHARARA97/ChillFocused-Linux/releases) 下载 `ChillFocused.dll`，放进 `BepInEx/plugins/`：
+从 [Releases](https://github.com/CHARARA97/ChillFocused-Linux/releases) 下载 `ChillFocused.dll`，放入 `BepInEx/plugins/`：
 
 ```
 Chill with You Lo-Fi Story/
@@ -60,37 +59,39 @@ Chill with You Lo-Fi Story/
     ├── config/
     │   └── com.chillfocused.plugin.cfg     ← 首次运行自动生成
     └── plugins/
-        └── ChillFocused.dll        ← 将dll装至此处
+        └── ChillFocused.dll
 ```
 
-> **⚠️ 不要同时装载两个 `ChillFocused*.dll`**（包括改名前的 `ChillFocus.dll`、或
-> `plugins/ChillFocused/` 子目录里的旧副本）。BepInEx 会把它们**都**加载，于是同一套功能跑两遍：
-> 两个面板、两次轮询。插件启动时会自己扫描并**在日志里警告**重复安装。
+**注意**：`BepInEx/plugins/` 下只应存在一个 `ChillFocused*.dll`；不要同时安装两个副本。
+旧版本的 `ChillFocus.dll`，以及 `plugins/ChillFocused/` 子目录中的副本，都必须删除。
+BepInEx 会加载该目录下的全部 DLL（包括子目录），重复安装会使同一功能执行两次。
+插件启动时会检测该情况并在日志中记录警告。
 
-### 3. 设定 winhttp
+### 3. 配置 winhttp 覆盖
 
-UnityDoorstop 要让 `winhttp.dll` 优先于内置版本，Proton 默认不这么做。
-**不设这一步，BepInEx 根本不会加载**，游戏看起来一切正常，插件毫无反应。
+UnityDoorstop 要求 `winhttp.dll` 优先于系统内置版本，Proton 默认不提供该覆盖。
+缺少该覆盖时 BepInEx 不会加载：游戏可正常运行，但插件不会生效。
 
-Shell命令：
+命令行配置：
 
 ```bash
 protontricks -c 'wine reg add "HKCU\Software\Wine\DllOverrides" /v winhttp /d "native,builtin" /f' 3548580
 ```
 
-或者：`protontricks --gui` → 选《Chill with You : Lo-Fi Story》→ Select default wineprefix →
-Run winecfg → Libraries → 新增 `winhttp` → 改成 **Native then Builtin** → Apply。
+图形界面配置：`protontricks --gui` → 选择《Chill with You : Lo-Fi Story》 →
+Select default wineprefix → Run winecfg → Libraries → 新增 `winhttp` →
+设为 **Native then Builtin** → Apply。
 
-也可以只在启动时生效（Steam 启动选项）：
+也可仅对单次启动生效（Steam 启动选项）：
 
 ```
 WINEDLLOVERRIDES="winhttp.dll=n,b" %command%
 ```
 
-### 4. 后端安装
+### 4. 安装后端
 
 ```bash
-# Arch
+# Arch Linux
 yay -S focused && systemctl --user enable --now focused
 # 其他发行版
 curl -fsSL <release-url>/install.sh | sh
@@ -99,12 +100,13 @@ curl -fsSL <release-url>/install.sh | sh
 ### 5. 自检
 
 ```bash
-focused-doctor        # 或 scripts/doctor-focused.sh
+focused-doctor        # 等价于 scripts/doctor-focused.sh
 ```
 
-它会逐项检查：后端、游戏目录、BepInEx、winhttp、DLL、日志里加载记录、插件与后端的地址/令牌是否一致
+自检项目：后端可达性、游戏目录、BepInEx、winhttp 覆盖、插件 DLL 与副本数量、
+日志中的加载记录、插件与后端的地址及令牌一致性。
 
-启动游戏后，`BepInEx/LogOutput.log` 里应出现：
+游戏启动后，`BepInEx/LogOutput.log` 中应出现：
 
 ```
 [Info   :ChillFocused] ChillFocused 0.1.0 loaded from .../BepInEx/plugins/ChillFocused.dll; backend at http://127.0.0.1:8766.
@@ -112,95 +114,116 @@ focused-doctor        # 或 scripts/doctor-focused.sh
 
 ## 热键
 
-| 键 | 作用 |
+| 按键 | 功能 |
 |---|---|
-| `F9` | 切换 HUD：单行 → 详细 → 关闭 |
-| `F7` | 设置面板（要冻结的应用 / 保护名单 / 行为 / 布局 / 诊断） |
-| `F8` | 立即扫描 |
+| `F9` | 切换 HUD 形态：单行 → 详细 → 关闭 |
+| `F7` | 打开设置面板（要屏蔽的应用、保护名单、行为、布局、诊断） |
+| `F8` | 立即执行一次扫描 |
 
 ## 卸载
 
-1. 删除 `BepInEx/plugins/ChillFocused.dll`；
-2. 插件配置 `BepInEx/config/com.chillfocused.*.cfg`（含名单与面板布局）；
-3. 后端（Focused）：`systemctl --user disable --now focused`。
+1. 删除 `BepInEx/plugins/ChillFocused.dll`。
+2. 如需同时清除配置，删除 `BepInEx/config/com.chillfocused.*.cfg`。
+3. 如不再需要后端：`systemctl --user disable --now focused`。
+
+保留 BepInEx 本身不影响其他插件。
 
 ## 配置
 
-`BepInEx/config/com.chillfocused.plugin.cfg`（首次运行生成）：
+配置文件为 `BepInEx/config/com.chillfocused.plugin.cfg`，首次运行时生成：
 
-| 键 | 默认 | 说明 |
+| 键 | 默认值 | 说明 |
 |---|---|---|
-| `FocusedUrl` | `http://127.0.0.1:8766` | 后端地址，必须是回环地址 |
-| `FocusedToken` | 空 | 与后端 `http.token` 一致时发送 `X-Focused-Token` |
-| `Enabled` | `true` | 总开关，关掉则永不冻结 |
-| `AlwaysOn` | `false` | `true` = 不看游戏计时器，游戏跑着就一直生效 |
-| `DryRun` | `false` | 只记录，不冻结（先看会命中谁） |
-| `TimerFreshSeconds` | `25` | 计时器读数多久算新鲜，超时视为这次创作结束 |
-| `SessionLeaseSeconds` | `30` | 心跳租约；插件消失后后端等这么久就全部恢复 |
-| `ProcessNames` | 空 | 要冻结的进程名，支持 `*` `?`，`;` 分隔 |
-| `CmdlineSubstrings` | 空 | 按启动参数匹配 |
-| `ExtraProtectedNames` / `ExtraProtectedCmdlineSubstrings` | 空 | 追加保护（只增不减） |
+| `FocusedUrl` | `http://127.0.0.1:8766` | 后端地址，必须为回环地址 |
+| `FocusedToken` | 空 | 与后端 `http.token` 一致时，请求携带 `X-Focused-Token` |
+| `Enabled` | `true` | 总开关，关闭后不执行任何冻结 |
+| `AlwaysOn` | `false` | 为 `true` 时忽略游戏计时器，游戏运行期间持续生效 |
+| `DryRun` | `false` | 只记录，不冻结 |
+| `TimerFreshSeconds` | `25` | 计时器读数的有效期，超时视为本次创作已结束 |
+| `SessionLeaseSeconds` | `30` | 心跳租约；插件停止心跳后，后端等待此时长并恢复全部进程 |
+| `ProcessNames` | 空 | 屏蔽名单中的进程名，支持 `*`、`?`，以 `;` 分隔 |
+| `CmdlineSubstrings` | 空 | 按启动参数匹配的子串 |
+| `ExtraProtectedNames` / `ExtraProtectedCmdlineSubstrings` | 空 | 追加保护项（仅可追加） |
 
 界面文案与布局：
 
-- `BepInEx/config/com.chillfocused.text.cfg` —— 每条文案的键，留空 = 用内置文案（**跟随游戏语言**）；
-  填上值 = 固定成你的措辞。
-- `BepInEx/config/com.chillfocused.panel.cfg` —— 面板尺寸、字号、配色、列表高度等，保存后 1 秒生效。
+- `BepInEx/config/com.chillfocused.text.cfg`：每条文案对应一个键。值为空时使用内置文案（跟随游戏语言）；
+  填写后固定为指定措辞。
+- `BepInEx/config/com.chillfocused.panel.cfg`：面板尺寸、字号、配色、列表高度等，保存后 1 秒内生效。
 
-> 这两个文件**不是**发布物：首次运行自动生成，删掉就回到内置默认值。
+两个文件均非发布内容：首次运行自动生成，删除后恢复内置默认值。
 
-## 常见问题
+## 故障排查
 
-**游戏里什么都没出现？** 按顺序看：① `BepInEx/LogOutput.log` 里有没有 `ChillFocused`；
-② 有没有 runner 加载记录（`Loaded 1 plugin` 之类）；③ winhttp 那一步做了没有。`focused-doctor` 会把这三步查完。
+**游戏内无任何显示。** 依次检查：① `BepInEx/LogOutput.log` 中是否存在 `ChillFocused` 记录；
+② 是否记录了 runner 加载（如 `Loaded 1 plugin`）；③ 是否已配置 winhttp 覆盖。
+`focused-doctor` 会完成以上检查。
 
-**HUD 显示「未生效 · Focused 未连接」？** 后端没在跑，或端口/令牌不一致：
-`systemctl --user status focused`，再对一下两边的地址与 `http.token`。
+**HUD 显示「未生效 · Focused 未连接」。** 后端未运行，或地址、令牌不一致：
+执行 `systemctl --user status focused`，并核对两侧的地址与 `http.token`。
 
-**HUD 显示「待机 · 开始游戏计时后自动生效」？** 一切正常，只是游戏计时还没开始。
+**HUD 显示「待机 · 开始游戏计时后自动生效」。** 状态正常，游戏计时尚未开始。
 
-**应用被冻住没收回来？**
+**有进程未恢复。**
 
 ```bash
-focusedd --frozen      # 看是谁
-focusedd --thaw-all    # 立刻全部恢复
-kill -USR1 $(pgrep -f focusedd)   # 同样的效果，走信号
+focusedd --frozen      # 列出当前被冻结的进程
+focusedd --thaw-all    # 立即恢复全部进程
+kill -USR1 $(pgrep -f focusedd)   # 等效操作，通过信号触发
 ```
 
-**日志里出现 "another copy of this plugin is installed"？**
-按它列出的路径删掉多余的 DLL —— BepInEx 会加载 `plugins/` 下所有 DLL（含子目录），两份 = 跑两遍。
+**日志出现 `another copy of this plugin is installed`。** 按日志列出的路径删除多余 DLL：
+BepInEx 会加载 `plugins/` 下所有 DLL（包括子目录）。
 
 ## 与其他 Mod 的关系
 
-- 本插件**不改游戏资源**：只读游戏自己的计时服务，把状态用 HTTP 交给宿主侧后端。
-- 因此与改音频/资源的 Mod（如 ChillPatcher）冲突面很小；与同样接管窗口行为的 Mod
-  （如 ChillClock 会最小化窗口）**可能**同时生效 —— 两者不冲突，但你会同时被最小化 + 被挂起，按需二选一。
-- 若你同时装了多个"读游戏计时"的 Mod，注意它们各自的开关注释见各自文档。
+- 本插件不修改游戏资源：仅读取游戏自身的计时服务，并通过回环 HTTP 将状态提交给宿主侧后端。
+- 与修改音频或资源的 Mod（如 ChillPatcher）冲突面很小。
+- 与接管窗口行为的 Mod（如 ChillClock 会最小化窗口）可能同时生效：两者不冲突，
+  但窗口会同时被最小化并挂起，建议只启用其中之一。
+- 若同时安装多个读取游戏计时的 Mod，请查阅各自的开关说明。
+
+## 术语对照
+
+用户可见文本只使用右列的说法；左列为实现或历史用词，不再出现。
+
+| 界面用词 | 对应实现 | 说明 |
+|---|---|---|
+| 屏蔽名单 / 屏蔽模式 | blacklist | 描述结果，不描述机制 |
+| 保护名单 / 保护模式 | protect list | 保护项仅可追加 |
+| 只记录，不冻结 | dry_run | 仅记录命中的进程，不挂起 |
+| 已冻结 N 个 | frozen_count | 实际执行的操作是冻结 |
+| 未生效 · 原因 | — | 未生效状态统一为一种表述 |
+| 按启动参数匹配 | cmdline_substrings | — |
+| 后台执行器 | Focused 后端进程 | 避免使用「守护进程」 |
+| 创作模式 | 游戏的工作时段（番茄钟专注阶段 / 正向计时） | 与游戏内用词一致 |
+
+以下用词已弃用，由 `tests/test_wording.py` 校验：`黑名单模式`、`白名单模式`、`黑名单`、`白名单`、
+`演练模式`、`冻结模式`、`守护进程`、`命令行子串`。
 
 ## 许可与第三方组件
 
-本插件源码：MIT（见仓库根目录 `LICENSE`）。
+本插件源码采用 MIT 许可，见仓库根目录 `LICENSE`。
 
-关于它依赖/引用的东西，界限是这样的：
+本插件不分发以下组件：
 
-| 组件 | 许可 | 我们是否分发它 |
+| 组件 | 许可 | 说明 |
 |---|---|---|
-| [BepInEx](https://github.com/BepInEx/BepInEx) 5.x | LGPL-2.1 | ❌ 不分发 —— 由用户自己安装；本插件在编译期引用它的程序集（`Private=false`），运行期用用户装好的那份 |
-| [HarmonyX](https://github.com/BepInEx/HarmonyX)（`0Harmony.dll`） | MIT | ❌ 不分发 —— 随 BepInEx 一起安装 |
-| 游戏自身的程序集（`Assembly-CSharp.dll` / UnityEngine） | 游戏 EULA | ❌ 不分发 —— 编译期引用，用于把插件接上游戏的钩子；Release 里只有本插件自己的 DLL |
-| 游戏资源（音频、模型、贴图、字体） | 游戏 EULA | ❌ 一概不含 |
+| [BepInEx](https://github.com/BepInEx/BepInEx) 5.x | LGPL-2.1 | 由用户自行安装；本插件在编译期引用其程序集（`Private=false`），运行期使用用户安装的副本 |
+| [HarmonyX](https://github.com/BepInEx/HarmonyX)（`0Harmony.dll`） | MIT | 随 BepInEx 一同安装 |
+| 游戏程序集（`Assembly-CSharp.dll`、UnityEngine） | 游戏 EULA | 仅在编译期引用，用于接入游戏接口；发行包中只包含本插件自身的 DLL |
+| 游戏资源（音频、模型、贴图、字体） | 游戏 EULA | 不包含 |
 
-> 简单说：MIT，自由使用/修改/分发，保留版权声明与许可文本，风险自负。
-> 本插件不含任何游戏文件，也不修改游戏资源；它只读游戏自己的计时与语言服务，
-> 并把"现在算不算专注"通过回环 HTTP 交给宿主侧后端。
+本插件不包含任何游戏文件，不修改游戏资源，仅读取游戏自身的计时与语言服务，
+并通过回环 HTTP 提交状态。
 
 ## 致谢
 
-- [BepInEx](https://github.com/BepInEx/BepInEx) 与 HarmonyX —— 插件底座
-- [ChillClock](https://github.com/anyukari/ChillClock) —— 本项目**借鉴了它的两条经验**：
-  用游戏自己的 DI 容器解析服务（`ProjectLifetimeScope.Resolve<T>()`）而不是只靠方法体注入；
-  以及跟随游戏语言供应商（`LanguageSupplier`）显示界面文案。
-  它的设置页注入思路又引用自 [iGPU Savior](https://github.com/Small-tailqwq/iGPUSaviorMod)。
-- [awesome-chillwithyou](https://github.com/clsty/awesome-chillwithyou) —— 本游戏 Mod 的索引
+- [BepInEx](https://github.com/BepInEx/BepInEx) 与 HarmonyX：插件平台。
+- [ChillClock](https://github.com/anyukari/ChillClock)：本项目采用其两项做法 ——
+  通过游戏自身的 DI 容器解析服务（`ProjectLifetimeScope.Resolve<T>()`），而非仅依赖方法体注入；
+  以及通过 `LanguageSupplier` 获取界面语言。其设置页注入方法参考
+  [iGPU Savior](https://github.com/Small-tailqwq/iGPUSaviorMod)。
+- [awesome-chillwithyou](https://github.com/clsty/awesome-chillwithyou)：本游戏 Mod 索引。
 
-> 本插件仅供学习交流，请支持正版游戏。
+本插件仅供学习与交流使用，请支持正版游戏。

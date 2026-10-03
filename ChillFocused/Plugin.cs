@@ -30,6 +30,8 @@ namespace ChillFocused
     public sealed class ChillFocusedPlugin : BaseUnityPlugin
     {
         private const string SectionGeneral = "1. General";
+        // A config *identifier*: renaming the section would orphan every setting a
+        // user already has saved under it.  The wording rule covers what people read.
         private const string SectionBlacklist = "2. Blacklist";
         private const string SectionProtect = "3. Protect";
         private const string SectionOverlay = "4. Overlay";
@@ -727,7 +729,7 @@ namespace ChillFocused
                 "窗口失焦时仍保持插件运行（默认开启）。\n" +
                 "某些 Wayland/XWayland 组合下合成器不发布 _NET_ACTIVE_WINDOW，Unity\n" +
                 "无法判断自己是否获得焦点，于是把整个帧循环暂停：Update/OnGUI 一次都\n" +
-                "不调用，表现为「没有面板、也不与守护进程通信」，而且不报任何异常。\n" +
+                "不调用，表现为「没有面板、也不与 Focused 后端通信」，而且不报任何异常。\n" +
                 "开启此项会设置 Application.runInBackground = true 来规避。\n" +
                 "Keep the plugin ticking while the window is not focused. Some Wayland/\n" +
                 "XWayland compositors publish no _NET_ACTIVE_WINDOW, so Unity cannot tell\n" +
@@ -760,7 +762,7 @@ namespace ChillFocused
 
             _dryRun = Config.Bind(
                 SectionGeneral, "DryRun", false,
-                "演练模式：只记录会冻结谁，不真的冻结。\n" +
+                "只记录，不冻结：只记录会命中哪些进程，不真的挂起它们。\n" +
                 "Rehearsal: record what would be suspended, suspend nothing.");
 
             _timerFreshSeconds = Config.Bind(
@@ -784,15 +786,15 @@ namespace ChillFocused
 
             _pollInterval = Config.Bind(
                 SectionGeneral, "PollIntervalSeconds", 1.0f,
-                "轮询守护进程状态的间隔（秒），下限 0.2。\n" +
+                "轮询 Focused 后端状态的间隔（秒），下限 0.2。\n" +
                 "How often to poll Focused, in seconds. Floor of 0.2s; a faster\n" +
                 "poll buys nothing because Focused's own scan interval is >= 0.2s.");
 
             _processNames = Config.Bind(
                 SectionBlacklist, "ProcessNames", string.Empty,
-                "要冻结的进程名，用分号或换行分隔，支持 * 和 ? 通配符，大小写不敏感。\n" +
+                "屏蔽名单里的进程名，用分号或换行分隔，支持 * 和 ? 通配符，大小写不敏感。\n" +
                 "例：firefox; chromium*; discord; Slack\n" +
-                "Process names to terminate, separated by ';' or newlines. Glob '*'\n" +
+                "Process names to suspend, separated by ';' or newlines. Glob '*'\n" +
                 "and '?' are supported; matching is case-insensitive. Both the kernel\n" +
                 "task name (comm) and the executable basename are considered.\n" +
                 "NOTE: names longer than 15 characters also match their kernel-\n" +
@@ -800,7 +802,7 @@ namespace ChillFocused
 
             _cmdlineSubstrings = Config.Bind(
                 SectionBlacklist, "CmdlineSubstrings", string.Empty,
-                "要冻结的命令行子串（用于改名或由脚本启动的应用），分号/换行分隔。\n" +
+                "屏蔽名单里的启动参数子串（用于改名或由脚本启动的应用），分号/换行分隔。\n" +
                 "例：--profile distractor; /opt/tools/distraction\n" +
                 "Substrings matched against the target's full command line. Use this\n" +
                 "when a process can be renamed, or when only one of several instances\n" +
@@ -808,16 +810,16 @@ namespace ChillFocused
 
             _protectedNames = Config.Bind(
                 SectionProtect, "ExtraProtectedNames", string.Empty,
-                "额外的白名单进程名。白名单只增不减：这里的内容会与守护进程内置的\n" +
+                "额外的保护名单进程名。保护名单只增不减：这里的内容会与 Focused 内置的\n" +
                 "保护名单（wineserver、steam、桌面合成器、systemd 等）合并。\n" +
                 "Extra protect names, separated by ';' or newlines. This list is\n" +
                 "ADDITIVE: Focused keeps its built-in rails (wineserver, steam, the\n" +
                 "compositor, systemd, ...) and unions them with these. Protection always\n" +
-                "wins over the blacklist, so an entry here can never be killed.");
+                "wins over the block list, so an entry here is never suspended.");
 
             _protectedCmdlineSubstrings = Config.Bind(
                 SectionProtect, "ExtraProtectedCmdlineSubstrings", string.Empty,
-                "额外的白名单命令行子串，同样只增不减。\n" +
+                "额外的保护名单启动参数子串，同样只增不减。\n" +
                 "Extra protect command-line substrings. Also additive.");
 
             _hudMode = Config.Bind(
@@ -827,7 +829,7 @@ namespace ChillFocused
                 "  Detailed = 分组多行，含计时器/执行器/热键，排查时用\n" +
                 "  Off      = 完全不显示\n" +
                 "How much the in-game overlay shows. F9 cycles it. Minimal is one line:\n" +
-                "a filled circle while the blacklist is being enforced, how many were\n" +
+                "a filled circle while the block list is being enforced, how many were\n" +
                 "closed, and nothing else. Detailed adds the timer, executor and hotkey\n" +
                 "rows for troubleshooting.");
 

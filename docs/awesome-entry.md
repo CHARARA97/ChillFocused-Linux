@@ -19,16 +19,16 @@
 ## ChillFocused（专注冻结）
 
 - **仓库**：[![<owner>/chillfocus](https://img.shields.io/github/stars/<owner>/chillfocus?label=<owner>%2Fchillfocus&style=flat-square)](https://github.com/<owner>/chillfocus)
-- **简介**：把黑名单里的应用在专注期间**挂起（冻结）**而不是关闭，计时结束原样恢复。由游戏内的番茄钟/正计时驱动；包含三个部分：游戏插件（本条目）、宿主侧后端应用 Focused、以及可选的浏览器扩展。
+- **简介**：把屏蔽名单里的应用在创作期间**挂起（冻结）**而不是关闭，计时结束原样恢复。由游戏内的番茄钟/正计时驱动；包含三个部分：游戏插件（本条目）、宿主侧后端应用 Focused、以及可选的浏览器扩展。
 - **许可**：MIT
 - **本地化**：界面三语言（简体中文 / English / 日本語），跟随游戏内的语言设置。文档：中、英。
 - **系统支持**：Windows（不支持 —— 后端依赖 Linux 的 `/proc`、cgroup v2、`SIGSTOP`，只有插件能加载）；Linux（**支持**，Steam / Proton 实测）；MacOS（未知）
 - **特性列举**：
   - 游戏计时器一响即挂起名单内的应用（`SIGSTOP` / cgroup freezer），休息阶段自动恢复，**不丢未保存内容**
   - 面板里从运行中的进程点选名单，支持通配符与按启动参数匹配
-  - 内置 450+ 条保护名单（合成器、终端、输入法、wine、游戏本体…），用户只能追加
+  - 内置 446 条保护名单（合成器、终端、输入法、wine、游戏本体…），用户只能追加
   - 面板布局是纯文本文件，改完保存即生效，无需重启游戏
-  - 「只记录，不冻结」演练模式：先确认会命中谁
+  - 「只记录，不冻结」：先确认会命中哪些进程再启用
   - 崩溃兜底：插件停止心跳 → 后端租约到期 → 自动全部恢复；后端被杀也有 `--thaw-all` 与 `systemctl --user` 钩子
   - 自带 `focused-doctor` 自检：逐项检查 BepInEx、winhttp override、重复 DLL、后端连通性与令牌
 ```
@@ -48,7 +48,7 @@ git checkout -b add-chillfocused
 git add README.md README.en.md
 git commit -m "Add ChillFocused"
 gh pr create --title "Add ChillFocused" --body "新增条目：ChillFocused（专注冻结）。
-专注期间把黑名单应用挂起而不是关闭，由游戏内计时驱动；Linux/Proton 实测支持。"
+创作期间把屏蔽名单里的应用挂起而不是关闭，由游戏内计时驱动；Linux/Proton 实测支持。"
 ```
 
 ## 提交前自检

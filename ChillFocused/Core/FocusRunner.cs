@@ -818,7 +818,7 @@ namespace ChillFocused.Core
                 _prevGateSatisfied = enforcing;
                 AddToast(
                     enforcing
-                        ? T("overlay.work_session_blacklist_active", "开始创作 · 已冻结黑名单应用")
+                        ? T("overlay.work_session_blacklist_active", "开始创作 · 已冻结屏蔽名单应用")
                         : T("overlay.session_ended_blacklist_paused", "创作结束 · 已全部恢复"),
                     false);
                 _hudLinesExpireAt = 0f;

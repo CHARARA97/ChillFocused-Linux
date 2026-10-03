@@ -154,7 +154,7 @@ namespace ChillFocused.Core
                 _styles.Hint, GUILayout.Width(100f));
             if (GUILayout.Button(_protectMode
                     ? PanelStrings.S("panel.mode_protect", "保护模式")
-                    : PanelStrings.S("panel.mode_block", "冻结模式"),
+                    : PanelStrings.S("panel.mode_block", "屏蔽模式"),
                     GUILayout.Width(80f)))
             {
                 _protectMode = !_protectMode;
@@ -190,7 +190,7 @@ namespace ChillFocused.Core
             // what clicking a row would then do to it.
             GUILayout.Label(_protectMode
                     ? PanelStrings.S("panel.hint_protect_mode", "保护模式 —— 点中的进程永不被冻结。受保护的进程平时不出现在这个列表里，所以这里是取消保护的地方。")
-                    : PanelStrings.S("panel.hint_block_mode", "冻结模式 —— 点中的进程会在游戏计时运行期间被冻结；再点一次移出名单。"),
+                    : PanelStrings.S("panel.hint_block_mode", "屏蔽模式 —— 点中的进程会在创作期间被冻结；再点一次移出名单。"),
                 _styles.Hint);
 
             _processScroll = GUILayout.BeginScrollView(
