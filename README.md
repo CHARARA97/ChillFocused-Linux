@@ -9,8 +9,6 @@
 《[放松时光：与你共享 Lo-Fi 故事](https://store.steampowered.com/app/3548580/)》的 BepInEx 插件。
 游戏创作模式运行期间，挂起（冻结）屏蔽名单中列出的进程；创作模式结束后恢复。
 
-<img src="packaging/thunderstore/icon.png" alt="ChillFocused" width="128">
-
 ---
 
 ## 功能
