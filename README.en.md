@@ -2,7 +2,7 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]((LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: Linux / Proton](https://img.shields.io/badge/Platform-Linux%20%2F%20Proton-blue.svg)](#requirements)
 [![BepInEx](https://img.shields.io/badge/BepInEx-5.x%20(not%206.0)-green.svg)](https://github.com/BepInEx/BepInEx)
 
@@ -75,7 +75,7 @@ game once so it creates `BepInEx/`.
 
 ### 2. Drop in one DLL
 
-Take `ChillFocused.dll` from [Releases]((releases) and put it in `BepInEx/plugins/`:
+Take `ChillFocused.dll` from [Releases](https://github.com/CHARARA97/ChillFocused-Linux/releases) and put it in `BepInEx/plugins/`:
 
 ```
 Chill with You Lo-Fi Story/

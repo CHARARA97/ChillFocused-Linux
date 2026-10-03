@@ -2,7 +2,7 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]((LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: Linux / Proton](https://img.shields.io/badge/Platform-Linux%20%2F%20Proton-blue.svg)](#系统要求)
 [![BepInEx](https://img.shields.io/badge/BepInEx-5.x%20(not%206.0)-green.svg)](https://github.com/BepInEx/BepInEx)
 
@@ -69,7 +69,7 @@
 
 ### 2. 放一个 DLL
 
-从 [Releases]((releases) 下载 `ChillFocused.dll`，放进 `BepInEx/plugins/`：
+从 [Releases](https://github.com/CHARARA97/ChillFocused-Linux/releases) 下载 `ChillFocused.dll`，放进 `BepInEx/plugins/`：
 
 ```
 Chill with You Lo-Fi Story/
