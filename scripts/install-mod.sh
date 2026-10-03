@@ -244,7 +244,7 @@ fi
 # --- 4. the backend, which is what actually suspends anything --------------
 say ""
 say "The backend does the suspending.  If it is not installed yet:"
-say "      the backend installer: https://github.com/OWNER/focused#installation"
+say "      the backend installer: https://github.com/CHARARA97/Focused#installation"
 say ""
 say "Then start the game and look for 'ChillFocused' in"
 say "      $GAME_DIR/BepInEx/LogOutput.log"

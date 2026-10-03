@@ -15,4 +15,4 @@
 嵌套对象会静默变成 `null`。后端因此专门保持 `/api/v1/focus` 扁平 —— 这个坑曾经让面板上的复选框卡住一整个版本。
 
 完整契约（所有端点、鉴权、事件流、插件注册）见后端仓库：
-**https://github.com/OWNER/focused/blob/main/docs/focused-protocol.md**
+**https://github.com/CHARARA97/Focused/blob/main/docs/focused-protocol.md**
