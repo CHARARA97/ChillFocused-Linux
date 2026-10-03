@@ -1,0 +1,7 @@
+{
+  "name": "ChillFocus",
+  "version_number": "0.1.0",
+  "website_url": "https://github.com/YOUR-USER/chillfocus",
+  "description": "Runtime app blacklist for study sessions: while focus mode is on, a host-side daemon terminates the applications you listed. Requires Focused on Linux/Proton (see the README). Kills nothing until you arm it.",
+  "dependencies": []
+}

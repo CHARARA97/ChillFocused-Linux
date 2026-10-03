@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <AssemblyName>ChillFocused.Tests</AssemblyName>
+    <RootNamespace>ChillFocused.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="*.cs" />
+
+    <!--
+      The Unity-free half of the plugin is compiled straight into this project.
+
+      There are no references to UnityEngine, BepInEx or the game here, so the
+      moment someone adds `using UnityEngine;` to one of these files the test
+      build fails. That is the point: it makes "pure logic stays pure" a compile
+      error rather than a code-review convention.
+    -->
+    <Compile Include="../ChillFocused/Core/RuleText.cs" />
+    <Compile Include="../ChillFocused/Core/FocusSettings.cs" />
+    <Compile Include="../ChillFocused/Core/SessionGate.cs" />
+    <Compile Include="../ChillFocused/Core/PluginInfo.cs" />
+    <Compile Include="../ChillFocused/Core/PluginInstallCheck.cs" />
+    <Compile Include="../ChillFocused/Core/GameServices.cs" />
+    <Compile Include="../ChillFocused/Core/GameLanguageProbe.cs" />
+    <Compile Include="../ChillFocused/Core/FocusedProtocol.cs" />
+    <Compile Include="../ChillFocused/Core/HttpTransport.cs" />
+    <Compile Include="../ChillFocused/Core/HeadlessRunner.cs" />
+    <Compile Include="../ChillFocused/Core/TimerState.cs" />
+    <Compile Include="../ChillFocused/Core/HudMode.cs" />
+    <Compile Include="../ChillFocused/Core/PanelSpec.cs" />
+    <Compile Include="../ChillFocused/Core/TextFit.cs" />
+    <Compile Include="../ChillFocused/Core/OverlayText.cs" />
+    <Compile Include="../ChillFocused/Core/Toasts.cs" />
+    <Compile Include="../ChillFocused/Core/HudState.cs" />
+    <Compile Include="../ChillFocused/Core/OverlayLayout.cs" />
+    <Compile Include="../ChillFocused/Core/Hotkeys.cs" />
+    <Compile Include="../ChillFocused/Core/PanelText.cs" />
+    <Compile Include="../ChillFocused/Core/PanelStrings.cs" />
+    <Compile Include="../ChillFocused/Core/AppFilter.cs" />
+    <Compile Include="../ChillFocused/Core/RuleSync.cs" />
+    <Compile Include="../ChillFocused/Core/ConfigFile.cs" />
+    <Compile Include="../ChillFocused/Core/PanelSpecFile.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+</Project>

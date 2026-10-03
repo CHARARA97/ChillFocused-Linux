@@ -1,0 +1,91 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>ChillFocused</AssemblyName>
+    <RootNamespace>ChillFocused</RootNamespace>
+    <!-- Unity 2022 Mono and the rest of the modding ecosystem sit at C# 7.3;
+         staying there avoids depending on runtime features the game's Mono
+         profile may not ship. -->
+    <LangVersion>7.3</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <UsesGameAssemblies>true</UsesGameAssemblies>
+    <DebugType>none</DebugType>
+    <!-- The version this release is built from.  The [BepInPlugin] attribute needs
+         a compile-time constant, so Core/PluginInfo.cs carries the same number and
+         VersionConsistencyTests fails the build if the two ever disagree: a
+         released DLL that lies about its own version is worse than a little
+         ceremony.  scripts/package-mod.sh also passes /p:SourceRevisionId=<sha>,
+         which the SDK folds into AssemblyInformationalVersion and Core/PluginInfo
+         reads back for logs and diagnostics. -->
+    <Version>0.1.0</Version>
+    <AssemblyVersion>$(Version).0</AssemblyVersion>
+    <FileVersion>$(Version).0</FileVersion>
+    <Deterministic>true</Deterministic>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1701;CS1702;NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Allows building net472 on Linux/macOS, where the framework reference
+         assemblies are not installed system-wide. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Plugin.cs" />
+    <Compile Include="Core/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- BepInEx ships into the game directory; $(BepInExCoreDir) resolves to
+         either that installation or the vendored copy (see Directory.Build.props).
+         Private=false: BepInEx's assemblies are already in the game. -->
+    <Reference Include="BepInEx">
+      <HintPath>$(BepInExCoreDir)/BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- Harmony, for a per-frame hook that survives losing every GameObject. -->
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExCoreDir)/0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Only the Unity modules this plugin actually uses. Everything else the
+         game ships stays unreferenced on purpose: the less surface the mod
+         touches, the less a game update can break. -->
+    <Reference Include="UnityEngine">
+      <HintPath>$(UnityManagedDir)/UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(UnityManagedDir)/UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(UnityManagedDir)/UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(UnityManagedDir)/UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>$(UnityManagedDir)/UnityEngine.JSONSerializeModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- Canvas.SendWillRenderCanvases, patched as the per-frame heartbeat. -->
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(UnityManagedDir)/UnityEngine.UIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- FontStyle, used by the overlay's title style. -->
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(UnityManagedDir)/UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

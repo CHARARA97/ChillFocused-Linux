@@ -1,0 +1,36 @@
+# Build output
+.build/
+bin/
+obj/
+*.user
+
+# Local machine configuration
+plugin/.env.props
+.env
+
+# Vendored / downloaded artifacts (re-obtainable via scripts/install-bepinex.sh)
+dist/
+third_party/
+
+# Python
+__pycache__/
+*.pyc
+
+# Editors
+.vs/
+.vscode/
+.idea/
+
+# Local stage backups: they contain THIS machine's real configs
+# (~/.config/chillfocus/config.json, the game's com.chillfocused.*.cfg).
+# Publishing them would leak the owner's blacklist and protect list.
+.backup/
+.tmp/
+
+# dotnet/pnpm scratch
+packages/
+*.nupkg
+
+# Split-repository build output
+*.pyc
+__pycache__/

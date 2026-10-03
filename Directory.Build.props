@@ -1,0 +1,47 @@
+<Project>
+
+  <!--
+    Shared build configuration for the ChillFocused plugin.
+
+    GameDir resolution order:
+      1. /p:GameDir="..." on the command line
+      2. CHILLFOCUS_GAME_DIR in the environment
+      3. .env.props (git-ignored, copy .env.props.example)
+      4. the default Steam library location on Linux, if it exists
+
+    Forward slashes are used everywhere so the same file works on Linux and
+    Windows; MSBuild normalises them per platform.
+  -->
+
+  <Import Project="$(MSBuildThisFileDirectory).env.props"
+          Condition="Exists('$(MSBuildThisFileDirectory).env.props')" />
+
+  <PropertyGroup>
+    <GameDir Condition="'$(GameDir)' == '' and '$(CHILLFOCUS_GAME_DIR)' != ''">$(CHILLFOCUS_GAME_DIR)</GameDir>
+    <DefaultGameDir Condition="'$(OS)' != 'Windows_NT'">$(HOME)/.local/share/Steam/steamapps/common/Chill with You Lo-Fi Story</DefaultGameDir>
+    <GameDir Condition="'$(GameDir)' == '' and '$(DefaultGameDir)' != '' and Exists('$(DefaultGameDir)')">$(DefaultGameDir)</GameDir>
+  </PropertyGroup>
+
+  <!-- Where to find BepInEx's own assemblies. Prefer the real installation, fall
+       back to the copy vendored in third_party/ so the plugin can be compiled
+       before BepInEx has been deployed into the game directory. -->
+  <PropertyGroup>
+    <BepInExCoreDir Condition="'$(GameDir)' != '' and Exists('$(GameDir)/BepInEx/core/BepInEx.dll')">$(GameDir)/BepInEx/core</BepInExCoreDir>
+    <BepInExCoreDir Condition="'$(BepInExCoreDir)' == ''">$(MSBuildThisFileDirectory)third_party/bepinex/BepInEx/core</BepInExCoreDir>
+    <UnityManagedDir Condition="'$(GameDir)' != '' and Exists('$(GameDir)/Chill With You_Data/Managed/UnityEngine.dll')">$(GameDir)/Chill With You_Data/Managed</UnityManagedDir>
+  </PropertyGroup>
+
+  <Target Name="ValidateChillFocusedGameDir"
+          BeforeTargets="ResolveAssemblyReferences"
+          Condition="'$(UsesGameAssemblies)' == 'true'">
+    <Error Condition="'$(GameDir)' == ''"
+           Text="GameDir is not set. Set CHILLFOCUS_GAME_DIR, copy .env.props.example to .env.props, or pass /p:GameDir=&quot;...&quot;. Expected the folder containing 'Chill With You.exe'." />
+    <Error Condition="'$(GameDir)' != '' and !Exists('$(GameDir)/Chill With You_Data/Managed/Assembly-CSharp.dll')"
+           Text="GameDir does not look like a Chill with You installation (no 'Chill With You_Data/Managed/Assembly-CSharp.dll'): $(GameDir)" />
+    <Error Condition="'$(GameDir)' != '' and !Exists('$(BepInExCoreDir)/BepInEx.dll')"
+           Text="BepInEx.dll was not found in $(BepInExCoreDir). Install BepInEx into the game, or vendor it under third_party/bepinex." />
+    <Error Condition="'$(GameDir)' != '' and !Exists('$(UnityManagedDir)/UnityEngine.CoreModule.dll')"
+           Text="Unity engine assemblies were not found in $(UnityManagedDir)." />
+  </Target>
+
+</Project>

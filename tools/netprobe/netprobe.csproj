@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    A tiny Windows console program whose only job is to answer one question:
+
+        can a process inside the Proton/Wine prefix reach the host's loopback?
+
+    It is built for net472 and run through protontricks, so it exercises exactly
+    the same networking path the BepInEx plugin uses, independent of BepInEx,
+    Unity and the plugin code. When the plugin cannot reach the daemon, this
+    separates "Wine networking is the problem" from "the plugin's HTTP client is
+    the problem".
+
+    Build and run: scripts/probe-wine-network.sh
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>netprobe</AssemblyName>
+    <RootNamespace>NetProbe</RootNamespace>
+    <LangVersion>7.3</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DebugType>none</DebugType>
+    <NoWarn>$(NoWarn);CS1701;CS1702;NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <!--
+      The plugin's real transport is compiled straight in, so this probe tests
+      the exact code that ships in ChillFocused.dll rather than a re-implementation
+      of it.
+    -->
+    <Compile Include="../../plugin/ChillFocused/Core/HttpTransport.cs" />
+  </ItemGroup>
+
+</Project>
