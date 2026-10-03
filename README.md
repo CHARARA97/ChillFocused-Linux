@@ -1,4 +1,4 @@
-# ChillFocused（专注冻结）
+# ChillFocused
 
 [简体中文](README.md) | [English](README.en.md)
 
@@ -7,31 +7,11 @@
 [![BepInEx](https://img.shields.io/badge/BepInEx-5.x%20(not%206.0)-green.svg)](https://github.com/BepInEx/BepInEx)
 
 一个用于《[放松时光：与你共享 Lo-Fi 故事](https://store.steampowered.com/app/3548580/)》的 BepInEx 插件：
-**游戏里的番茄钟 / 正计时一响，黑名单里的应用就被挂起（冻结），计时结束原样恢复。**
-
-游戏画面、界面比例均不受影响；被冻结的应用 CPU 占用归零，随时可以解冻。
+**开启创作模式时冻结黑名单中的进程，创作模式结束后恢复进程。**
 
 <img src="packaging/thunderstore/icon.png" alt="ChillFocused" width="128">
 
 ---
-
-## 它解决什么问题
-
-专注软件首先得能专注。
-
-- 你列了几个总会分心的应用（浏览器、聊天软件、别的游戏）；
-- 游戏里的创作计时开始时，它们被**挂起**（`SIGSTOP` / cgroup freezer，不是关掉）；
-- 计时暂停、结束，或你按了放行，它们**原样回来**，未保存的内容都还在；
-- 怎么都救不回来的时候，有一条命令立刻全部恢复。
-
-**为什么是冻结而不是最小化/关掉**：最小化挡不住你点开它；关掉会丢未保存的东西。
-挂起是唯一"立刻不能打扰你、又完全不丢状态"的做法，而且它是可逆的 ——
-任何异常路径（插件崩溃、后端被杀、机器重启）都会解冻。
-
-## 效果演示
-
-> TODO(作者)：放 2 张截图或一段 10 秒 GIF：① 游戏内 HUD 显示「生效中 · 创作模式 / 已冻结 3」；
-> ② 面板（F7）的「要冻结的应用」列表。放在 `docs/images/` 下，然后把这里替换成图片引用。
 
 ## 功能
 
@@ -67,7 +47,7 @@
 解压到**游戏根目录**（就是有 `Chill With You.exe` 的那层），然后**先启动一次游戏**，
 让它生成 `BepInEx/` 目录。
 
-### 2. 放一个 DLL
+### 2. 装载 DLL
 
 从 [Releases](https://github.com/CHARARA97/ChillFocused-Linux/releases) 下载 `ChillFocused.dll`，放进 `BepInEx/plugins/`：
 
@@ -80,19 +60,19 @@ Chill with You Lo-Fi Story/
     ├── config/
     │   └── com.chillfocused.plugin.cfg     ← 首次运行自动生成
     └── plugins/
-        └── ChillFocused.dll        ← 就这一个文件
+        └── ChillFocused.dll        ← 将dll装至此处
 ```
 
-> **⚠️ 不要同时放两个 `ChillFocused*.dll`**（包括改名前的 `ChillFocus.dll`、或
+> **⚠️ 不要同时装载两个 `ChillFocused*.dll`**（包括改名前的 `ChillFocus.dll`、或
 > `plugins/ChillFocused/` 子目录里的旧副本）。BepInEx 会把它们**都**加载，于是同一套功能跑两遍：
 > 两个面板、两次轮询。插件启动时会自己扫描并**在日志里警告**重复安装。
 
-### 3. 设定 winhttp（最容易漏的一步）
+### 3. 设定 winhttp
 
 UnityDoorstop 要让 `winhttp.dll` 优先于内置版本，Proton 默认不这么做。
 **不设这一步，BepInEx 根本不会加载**，游戏看起来一切正常，插件毫无反应。
 
-持久做法（推荐，一条命令）：
+Shell命令：
 
 ```bash
 protontricks -c 'wine reg add "HKCU\Software\Wine\DllOverrides" /v winhttp /d "native,builtin" /f' 3548580
@@ -107,9 +87,7 @@ Run winecfg → Libraries → 新增 `winhttp` → 改成 **Native then Builtin*
 WINEDLLOVERRIDES="winhttp.dll=n,b" %command%
 ```
 
-### 4. 装后端
-
-后端才是真正挂起应用的那个程序：
+### 4. 后端安装
 
 ```bash
 # Arch
@@ -124,8 +102,7 @@ curl -fsSL <release-url>/install.sh | sh
 focused-doctor        # 或 scripts/doctor-focused.sh
 ```
 
-它会逐项检查：后端在不在、游戏目录、BepInEx、winhttp、DLL 是否装了/有几份、日志里有没有加载记录、
-插件与后端的地址/令牌是否一致 —— 每一条 ✗ 都给出该敲的命令。
+它会逐项检查：后端、游戏目录、BepInEx、winhttp、DLL、日志里加载记录、插件与后端的地址/令牌是否一致
 
 启动游戏后，`BepInEx/LogOutput.log` 里应出现：
 
@@ -137,21 +114,19 @@ focused-doctor        # 或 scripts/doctor-focused.sh
 
 | 键 | 作用 |
 |---|---|
-| `F9` | 切换 HUD：一行 → 详细 → 关闭 |
+| `F9` | 切换 HUD：单行 → 详细 → 关闭 |
 | `F7` | 设置面板（要冻结的应用 / 保护名单 / 行为 / 布局 / 诊断） |
-| `F8` | 立即扫描一次 |
+| `F8` | 立即扫描 |
 
 ## 卸载
 
-1. 删掉 `BepInEx/plugins/ChillFocused.dll`；
-2. 想一并清掉配置就删 `BepInEx/config/com.chillfocused.*.cfg`（含名单与面板布局）；
-3. 后端如果不再需要：`systemctl --user disable --now focused`。
-
-BepInEx 本身留着不影响其他 Mod。
+1. 删除 `BepInEx/plugins/ChillFocused.dll`；
+2. 插件配置 `BepInEx/config/com.chillfocused.*.cfg`（含名单与面板布局）；
+3. 后端（Focused）：`systemctl --user disable --now focused`。
 
 ## 配置
 
-`BepInEx/config/com.chillfocused.plugin.cfg`（首次运行生成；在面板里改也一样）：
+`BepInEx/config/com.chillfocused.plugin.cfg`（首次运行生成）：
 
 | 键 | 默认 | 说明 |
 |---|---|---|
