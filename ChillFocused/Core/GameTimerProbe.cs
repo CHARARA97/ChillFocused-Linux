@@ -246,10 +246,15 @@ namespace ChillFocused.Core
             bool? coreResting = CallBool(_core, "IsCurrentResting");
             bool? pomodoroRunning = CallBool(_pomodoro, "IsTimerRunning");
             bool? pomodoroWorking = CallBool(_pomodoro, "IsCurrentWorking");
+            bool? pomodoroResting = CallBool(_pomodoro, "IsCurrentResting");
+
+            // The phase, straight from the game: Work / Break / Complete.
+            var phase = CallName(_pomodoro, "CurrentPomodoroType");
 
             var raw = string.Format(
-                "{0} | core work={1} rest={2} | pomodoro run={3} work={4}",
-                hit, Show(coreWorking), Show(coreResting), Show(pomodoroRunning), Show(pomodoroWorking));
+                "{0} | core work={1} rest={2} | pomodoro run={3} work={4} rest={5} phase={6}",
+                hit, Show(coreWorking), Show(coreResting), Show(pomodoroRunning),
+                Show(pomodoroWorking), Show(pomodoroResting), phase ?? "?");
 
             // Announce each distinct source once, so the log shows which hooks fire
             // without flooding it.
@@ -275,6 +280,9 @@ namespace ChillFocused.Core
                 Running = running ?? false,
                 Source = hit,
                 ChangedAt = UnityEngine.Time.unscaledTime,
+                ReadAt = UnityEngine.Time.unscaledTime,
+                Phase = phase,
+                Resting = coreResting == true || pomodoroResting == true,
             };
 
             Publish(next, raw);
@@ -288,6 +296,9 @@ namespace ChillFocused.Core
                 previous = _state;
                 if (previous.SameAs(next))
                 {
+                    // Same values, new reading: liveness is about the reading, so the
+                    // timestamp has to move even when nothing else does.
+                    _state.ReadAt = next.ReadAt;
                     _lastRaw = raw;
                     return;
                 }
@@ -322,6 +333,31 @@ namespace ChillFocused.Core
         private static string Show(bool? value)
         {
             return value.HasValue ? (value.Value ? "true" : "false") : "n/a";
+        }
+
+        /// <summary>The name of an enum-returning, no-argument method, or null.</summary>
+        private static string CallName(object instance, string method)
+        {
+            if (instance == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                var info = instance.GetType().GetMethod(method, System.Type.EmptyTypes);
+                if (info == null)
+                {
+                    return null;
+                }
+
+                var value = info.Invoke(instance, null);
+                return value == null ? null : value.ToString();
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
         }
 
         private static bool? CallBool(object instance, string method)

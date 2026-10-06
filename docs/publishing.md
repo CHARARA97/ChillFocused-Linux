@@ -176,7 +176,7 @@ Release 说明建议包含：**这版做了什么 / 需要什么（BepInEx 5.4.2
 ④ 每个仓库的 Description/Topics/Actions 权限（§1.4）
 ⑤ 提 awesome-chillwithyou 的 PR（草稿已备好，指向 chillfocused 仓库）
 ⑥ 视反响决定是否上 Nexus/Thunderstore，以及是否做 Windows 后端
-⑦ 后端另发 AUR（focused / focused-git，PKGBUILD 已生成在 packaging/aur/）
+⑦ 后端另发 AUR（focused / focused-git，PKGBUILD 已生成在 packaging/aur/）—— 但 AUR 目前关闭新用户注册，需等到重新开放
 ```
 
 ---

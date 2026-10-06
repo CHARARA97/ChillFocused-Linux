@@ -24,9 +24,32 @@ namespace ChillFocused.Core
         /// <summary>Unscaled time of the reading.</summary>
         public float ChangedAt;
 
+        /// <summary>When this state was last *read* from the game.</summary>
+        /// <remarks>
+        /// Different from <see cref="ChangedAt"/> on purpose: a work phase reports the
+        /// same values for its whole length, so "the last time anything changed" is
+        /// useless as a liveness signal -- measuring freshness from it made every
+        /// steady session look stale after the window (25 s by default) and turned the
+        /// session off while the game was still counting.
+        /// </remarks>
+        public float ReadAt;
+
+        /// <summary>The game's phase: "Work", "Break", "Complete", or empty if unknown.</summary>
+        /// <remarks>
+        /// The game exposes this directly (PomodoroService.CurrentPomodoroType), which
+        /// removes the guesswork: the booleans say "working" or "not working", while the
+        /// phase says *why* -- a break, a completed phase, or a pause (phase Work with
+        /// IsTimerRunning false).
+        /// </remarks>
+        public string Phase;
+
+        /// <summary>True while the game reports its break phase.</summary>
+        public bool Resting;
+
         public bool SameAs(TimerState other)
         {
-            return Known == other.Known && Working == other.Working && Running == other.Running;
+            return Known == other.Known && Working == other.Working && Running == other.Running
+                   && Resting == other.Resting && string.Equals(Phase, other.Phase, System.StringComparison.Ordinal);
         }
     }
 }

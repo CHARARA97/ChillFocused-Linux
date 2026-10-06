@@ -39,20 +39,39 @@ namespace ChillFocused.Core
                 return true;
             }
 
-            if (!timer.Known || !timer.Running)
+            if (!timer.Known)
             {
                 return false;
             }
 
-            // Working is what the game calls a work phase; a break phase is running
-            // too, but it must not freeze anything.
-            if (!timer.Working)
+            // The game states the phase outright (Work / Break / Complete), which is
+            // more informative than the booleans: a break and a completed phase both
+            // report "not working", and neither should freeze anything, while a pause
+            // keeps the phase at Work with the timer stopped.
+            var phase = timer.Phase ?? string.Empty;
+            var working = timer.Working || string.Equals(phase, "Work", System.StringComparison.Ordinal);
+
+            if (!working)
             {
+                return false;
+            }
+
+            if (!timer.Running)
+            {
+                // Paused mid-work: the phase still says Work, so this is not "the
+                // session ended", it is "the game stopped counting".
                 return false;
             }
 
             var window = freshSeconds > 0f ? freshSeconds : DefaultFreshSeconds;
-            return now - timer.ChangedAt <= window;
+
+            // Freshness is about the last *reading*, not the last change: a steady
+            // work phase reports identical values for its whole length, and measuring
+            // from the last change expired every session after the window while the
+            // game was still counting.  States without a ReadAt fall back to the old
+            // field so the rule stays total.
+            var lastReading = timer.ReadAt > 0f ? timer.ReadAt : timer.ChangedAt;
+            return now - lastReading <= window;
         }
     }
 }

@@ -31,6 +31,28 @@ __pycache__/
 packages/
 *.nupkg
 
+# Python packaging output
+*.egg-info/
+.venv/
+build/
+
 # Split-repository build output
 *.pyc
 __pycache__/
+*.egg-info/
+.venv/
+build/
+dist/
+
+# AUR build leftovers: only PKGBUILD, .SRCINFO and the .install file belong in a
+# package repository, and the .SRCINFO that matters lives in the AUR clone.
+packaging/aur/**/src/
+packaging/aur/**/pkg/
+packaging/aur/**/*.tar.gz
+packaging/aur/**/*.pkg.tar.*
+packaging/aur/**/.SRCINFO
+
+# Source archives made for AUR builds: both where makepkg looks and wherever the
+# maintainer happened to create them.
+*.tar.gz
+*.pkg.tar.*

@@ -13,13 +13,17 @@ namespace ChillFocused.Tests
     public class SessionGateTests
     {
         private static TimerState Timer(bool working, bool running = true, bool known = true,
-                                        float changedAt = 100f)
+                                        float changedAt = 100f, float readAt = 0f,
+                                        string phase = null, bool resting = false)
         {
             return new TimerState
             {
                 Known = known,
                 Working = working,
                 Running = running,
+                ReadAt = readAt,
+                Phase = phase,
+                Resting = resting,
                 Source = "test",
                 ChangedAt = changedAt,
             };
@@ -52,6 +56,70 @@ namespace ChillFocused.Tests
         {
             Assert.False(SessionGate.Active(
                 enabled: true, alwaysOn: false, timer: Timer(false), now: 110f, freshSeconds: 25f));
+        }
+
+        [Fact]
+        public void A_steady_work_phase_does_not_expire()
+        {
+            // The regression: a work phase reports the same values for its whole
+            // length, so ChangedAt stops moving.  Freshness has to follow the last
+            // reading instead, or the session turns off after the window while the
+            // game is still counting.
+            var timer = Timer(working: true, changedAt: 100f, readAt: 990f);
+
+            Assert.True(SessionGate.Active(true, false, timer, now: 1000f, freshSeconds: 25f));
+        }
+
+        [Fact]
+        public void A_break_phase_releases_even_though_the_timer_runs()
+        {
+            // Phase Break with the timer still running: the game is on a break, so the
+            // apps come back -- the documented behaviour.
+            var timer = Timer(working: false, running: true, phase: "Break", resting: true,
+                              changedAt: 990f, readAt: 995f);
+
+            Assert.False(SessionGate.Active(true, false, timer, now: 1000f, freshSeconds: 25f));
+        }
+
+        [Fact]
+        public void A_completed_phase_is_not_a_session()
+        {
+            var timer = Timer(working: false, running: true, phase: "Complete",
+                              changedAt: 990f, readAt: 995f);
+
+            Assert.False(SessionGate.Active(true, false, timer, now: 1000f, freshSeconds: 25f));
+        }
+
+        [Fact]
+        public void A_paused_work_phase_is_not_a_session_yet()
+        {
+            // Phase Work but the timer is stopped: paused, not ended.  Today this
+            // releases (0 s of grace); the point is that it is distinguishable from a
+            // break, which the phase name now makes explicit.
+            var timer = Timer(working: true, running: false, phase: "Work",
+                              changedAt: 990f, readAt: 995f);
+
+            Assert.False(SessionGate.Active(true, false, timer, now: 1000f, freshSeconds: 25f));
+        }
+
+        [Fact]
+        public void The_phase_name_alone_can_hold_a_session_open()
+        {
+            // Some hooks report the phase before the booleans agree; Work wins.
+            var timer = Timer(working: false, running: true, phase: "Work",
+                              changedAt: 990f, readAt: 995f);
+
+            Assert.True(SessionGate.Active(true, false, timer, now: 1000f, freshSeconds: 25f));
+        }
+
+        [Fact]
+        public void Readings_that_stopped_arriving_expire()
+        {
+            // The case the window exists for: the game is paused or gone, so nothing
+            // is being read any more.
+            var timer = Timer(working: true, changedAt: 100f, readAt: 100f);
+
+            Assert.False(SessionGate.Active(true, false, timer, now: 1000f, freshSeconds: 25f));
         }
 
         [Fact]

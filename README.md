@@ -91,11 +91,12 @@ WINEDLLOVERRIDES="winhttp.dll=n,b" %command%
 ### 4. 安装后端
 
 ```bash
-# Arch Linux
-yay -S focused && systemctl --user enable --now focused
-# 其他发行版
-curl -fsSL <release-url>/install.sh | sh
+curl -fsSL https://github.com/CHARARA97/Focused/releases/latest/download/install.sh | sh
+systemctl --user enable --now focused
 ```
+
+Arch Linux 也可以从后端仓库本地构建 AUR 包（AUR 目前关闭新用户注册，暂未提交）：
+`git clone https://github.com/CHARARA97/Focused && cd Focused/packaging/aur/focused && updpkgsums && makepkg -si`。
 
 ### 5. 自检
 

@@ -64,5 +64,5 @@ gh pr create --title "Add ChillFocused" --body "新增条目：ChillFocused（�
 
 | 组件 | 渠道 |
 |---|---|
-| 后端 Focused | AUR（`focused` / `focused-git`）+ PyPI（可选）+ GitHub Release 的 wheel 与 `install.sh`；不在这个列表里（它不是游戏 Mod） |
+| 后端 Focused | GitHub Release（wheel + sdist + `install.sh`）；AUR 包已就绪但 AUR 暂关闭注册；不在这个列表里（它不是游戏 Mod） |
 | 浏览器扩展 | Chrome Web Store（主）+ Release zip 加载已解压目录 |

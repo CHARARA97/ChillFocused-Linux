@@ -95,11 +95,13 @@ WINEDLLOVERRIDES="winhttp.dll=n,b" %command%
 ### 4. Install the backend
 
 ```bash
-# Arch Linux
-yay -S focused && systemctl --user enable --now focused
-# other distributions
-curl -fsSL <release-url>/install.sh | sh
+curl -fsSL https://github.com/CHARARA97/Focused/releases/latest/download/install.sh | sh
+systemctl --user enable --now focused
 ```
+
+On Arch the AUR package can be built locally from the backend repository (AUR sign-ups are
+currently closed, so it has not been submitted yet):
+`git clone https://github.com/CHARARA97/Focused && cd Focused/packaging/aur/focused && updpkgsums && makepkg -si`.
 
 ### 5. Verify
 
