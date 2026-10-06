@@ -59,12 +59,9 @@ namespace ChillFocused.Core
         private bool _loggedVersionDiagnostics;
         private TimerState _timerState;
 
-        // The session is decided here, then told to Focused as a lease it has to keep
-        // hearing. ``_sessionActive`` is what was last reported, so the heartbeat can
-        // skip a request when nothing changed.
+        // Mirrors the headless runner's decision, for the overlay and the panel.  This
+        // class does not decide the session and does not report it: one owner per lease.
         private bool _sessionActive;
-        private float _nextHeartbeatAt;
-        private readonly string _sessionSource = "game-timer";
 
         // activity
         private int _closedTotal;
@@ -658,48 +655,22 @@ namespace ChillFocused.Core
         /// that a single lost request cannot let the lease lapse, cheap enough that it
         /// is one loopback request every few seconds.
         /// </remarks>
+        /// <summary>Mirror the session decision the headless runner made.</summary>
+        /// <remarks>
+        /// This used to send its own heartbeat, gated on <c>_connected</c>.  Two runners
+        /// therefore owned one lease, and because this one treats "not connected" as
+        /// "not focusing" it released the session the other runner had just claimed --
+        /// once every heartbeat, which is exactly what the flap in the log was.
+        ///
+        /// The session is a statement about the game, not about our HTTP client: if the
+        /// connection drops, the report simply fails and Focused's lease expires, which
+        /// is the fail-safe we want.  The headless runner owns the decision; this class
+        /// reads it so the overlay and the panel agree.
+        /// </remarks>
         private void Heartbeat(bool force)
         {
-            if (_client == null || _client.Busy)
-            {
-                return;
-            }
-
-            var active = _connected && _settings.SessionActive(_timerState, Time.unscaledTime);
-            var lease = _settings.SessionLeaseSeconds;
-            if (!force && active == _sessionActive && Time.unscaledTime < _nextHeartbeatAt)
-            {
-                return;
-            }
-
-            _nextHeartbeatAt = Time.unscaledTime + Mathf.Max(2f, lease * 0.5f);
-            var changed = active != _sessionActive;
-            _sessionActive = active;
-
-            _client.ReportSessionAsync(active, _settings.DryRun, lease, _sessionSource,
-                delegate(SimpleResponse response, string error)
-                {
-                    if (error != null || response == null || !response.ok)
-                    {
-                        SetWarning("session heartbeat failed: " + (error ?? "unexpected response"));
-                        return;
-                    }
-
-                    if (changed)
-                    {
-                        Inform("session " + (active ? "claimed" : "released") +
-                               " (lease " + lease + "s)");
-                    }
-                });
-
-            // Local feedback, so the panel reacts even when Focused is unreachable.
-            _focusedDryRun = _settings.DryRun;
-            _gateEnabled = !_settings.AlwaysOn;
-            _gateSatisfied = active;
-            if (_panel != null)
-            {
-                _panel.SetGateState(_connected, _gateEnabled, _gateSatisfied);
-            }
+            _sessionActive = HeadlessRunner.SessionActive;
+            _gateSatisfied = _sessionActive;
         }
 
         private void PushRules()

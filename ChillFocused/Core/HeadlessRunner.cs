@@ -74,6 +74,17 @@ namespace ChillFocused.Core
             _warn = warn ?? (message => { });
         }
 
+        /// <summary>The headless runner's last session decision.</summary>
+        /// <remarks>
+        /// The headless runner owns the session heartbeat: it always runs, while the
+        /// Unity-side component can be destroyed and recreated by a scene load (it was,
+        /// repeatedly, on this game).  Two owners of one lease is a race -- the two
+        /// heartbeats overwrote each other every couple of seconds and the session
+        /// flapped on and off -- so the Unity side mirrors this value instead of
+        /// sending its own.
+        /// </remarks>
+        internal static bool SessionActive { get; private set; }
+
         public bool Connected
         {
             get { lock (_gate) { return _connected; } }
@@ -283,6 +294,7 @@ namespace ChillFocused.Core
             var timer = provider != null ? provider() : default(TimerState);
             var now = TimeSinceStart();
             var active = settings.SessionActive(timer, now);
+            SessionActive = active;
             var body =
                 "{\"active\":" + (active ? "true" : "false") +
                 ",\"dry_run\":" + (settings.DryRun ? "true" : "false") +

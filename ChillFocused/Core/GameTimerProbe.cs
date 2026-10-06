@@ -345,7 +345,20 @@ namespace ChillFocused.Core
 
             try
             {
-                var info = instance.GetType().GetMethod(method, System.Type.EmptyTypes);
+                var type = instance.GetType();
+
+                // CurrentPomodoroType is a *property*: the metadata calls it
+                // get_CurrentPomodoroType, and looking only for a method of the plain
+                // name silently returned null (the log showed phase=? for a whole run).
+                var property = type.GetProperty(method);
+                if (property != null && property.GetIndexParameters().Length == 0)
+                {
+                    var fromProperty = property.GetValue(instance, null);
+                    return fromProperty == null ? null : fromProperty.ToString();
+                }
+
+                var info = type.GetMethod(method, System.Type.EmptyTypes)
+                           ?? type.GetMethod("get_" + method, System.Type.EmptyTypes);
                 if (info == null)
                 {
                     return null;
