@@ -2,7 +2,7 @@
 
 > **发行形态是三个独立仓库**（`focused` / `chillfocused` / `focused-extension`）。
 > 仓库怎么分、内容映射、三个仓库各自的首次发布命令、以及发布后的同步流程，
-> 见 **[repo-split.md](repo-split.md)**。本文讲的是与平台有关的规则与红线，三个仓库通用。
+> 见 **[../README.md](../README.md)**。本文讲的是与平台有关的规则与红线，三个仓库通用。
 
 > 面向"**第一次在 GitHub 发东西、第一次发游戏 Mod**"。每一步都给可复制的命令，以及
 > "平台会因此拒绝你"的具体红线（红线部分来自平台官方规则，文末列了出处）。
@@ -73,7 +73,7 @@ git push -u origin main
 ### 1.3 打标签 + 发 Release（插件就是这么发出去的）
 
 ```bash
-# 1) 先确保版本号唯一来源正确：plugin/ChillFocused/ChillFocused.csproj 的 <Version>
+# 1) 先确保版本号唯一来源正确：ChillFocused/ChillFocused.csproj 的 <Version>
 #    测试会替你守住它与源码常量一致（VersionConsistencyTests）
 scripts/package-mod.sh --offline            # 产出 dist/mod/ChillFocused.dll + .sha256
 
@@ -85,7 +85,7 @@ git push origin v0.1.0
 gh release create v0.1.0 \
    dist/mod/ChillFocused.dll dist/mod/ChillFocused.dll.sha256 \
    --title "ChillFocused 0.1.0" \
-   --notes-file plugin/ChillFocused/CHANGELOG.md      # 没有就先 --generate-notes
+   --notes-file ChillFocused/CHANGELOG.md      # 没有就先 --generate-notes
 ```
 
 Release 说明建议包含：**这版做了什么 / 需要什么（BepInEx 5.4.23.5、Linux+Proton）/ 怎么装（三步）/
@@ -172,7 +172,7 @@ Release 说明建议包含：**这版做了什么 / 需要什么（BepInEx 5.4.2
 ② 生成三个仓库：scripts/split-repos.sh --owner <你的账号> --verify
 ③ 先发后端 focused（插件与 doctor 都指向它）→ 再发 chillfocused → 最后发扩展
    每个仓库：git init → 首次提交 → push → tag v0.1.0 → gh release create
-   —— 逐条命令见 docs/repo-split.md §3
+   —— 逐条命令见 ../README.md §3
 ④ 每个仓库的 Description/Topics/Actions 权限（§1.4）
 ⑤ 提 awesome-chillwithyou 的 PR（草稿已备好，指向 chillfocused 仓库）
 ⑥ 视反响决定是否上 Nexus/Thunderstore，以及是否做 Windows 后端

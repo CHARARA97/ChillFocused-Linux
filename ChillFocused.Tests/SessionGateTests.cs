@@ -14,11 +14,13 @@ namespace ChillFocused.Tests
     {
         private static TimerState Timer(bool working, bool running = true, bool known = true,
                                         float changedAt = 100f, float readAt = 0f,
-                                        string phase = null, bool resting = false)
+                                        string phase = null, bool resting = false,
+                                        TimerMode mode = TimerMode.Pomodoro)
         {
             return new TimerState
             {
                 Known = known,
+                Mode = mode,
                 Working = working,
                 Running = running,
                 ReadAt = readAt,
@@ -146,6 +148,42 @@ namespace ChillFocused.Tests
             Assert.False(SessionGate.Active(
                 enabled: true, alwaysOn: false, timer: Timer(true, running: false), now: 110f,
                 freshSeconds: 25f));
+        }
+
+        [Fact]
+        public void An_unknown_timer_mode_fails_closed()
+        {
+            var timer = Timer(working: true, running: true, phase: "Work",
+                              changedAt: 990f, readAt: 995f, mode: TimerMode.Unknown);
+
+            Assert.False(SessionGate.Active(true, false, timer, now: 1000f, freshSeconds: 25f));
+        }
+
+        [Fact]
+        public void A_running_countup_is_a_session()
+        {
+            var timer = Timer(working: true, running: true, phase: null,
+                              changedAt: 990f, readAt: 995f, mode: TimerMode.Countup);
+
+            Assert.True(SessionGate.Active(true, false, timer, now: 1000f, freshSeconds: 25f));
+        }
+
+        [Fact]
+        public void A_stopped_countup_is_not_a_session()
+        {
+            var timer = Timer(working: false, running: false, phase: null,
+                              changedAt: 990f, readAt: 995f, mode: TimerMode.Countup);
+
+            Assert.False(SessionGate.Active(true, false, timer, now: 1000f, freshSeconds: 25f));
+        }
+
+        [Fact]
+        public void A_stale_countup_is_not_a_session()
+        {
+            var timer = Timer(working: true, running: true, phase: null,
+                              changedAt: 100f, readAt: 100f, mode: TimerMode.Countup);
+
+            Assert.False(SessionGate.Active(true, false, timer, now: 1000f, freshSeconds: 25f));
         }
 
         [Fact]

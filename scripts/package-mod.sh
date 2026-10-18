@@ -13,7 +13,7 @@
 #   dist/mod/ChillFocused.dll
 #   dist/mod/ChillFocused.dll.sha256
 #
-# The version comes from <Version> in plugin/ChillFocused/ChillFocused.csproj.
+# The version comes from <Version> in ChillFocused/ChillFocused.csproj.
 # The git commit is folded into the assembly as AssemblyInformationalVersion, and
 # the plugin logs it -- so "which build is this?" is answerable from the DLL alone.
 

@@ -14,38 +14,15 @@
     <Compile Include="*.cs" />
 
     <!--
-      The Unity-free half of the plugin is compiled straight into this project.
+      Pure layers are compiled automatically. Adding a new file under Domain,
+      Sync, Status, Ports, Config, Support, UI/Model or Platform/Pure puts it in
+      the test build without another csproj edit.
 
-      There are no references to UnityEngine, BepInEx or the game here, so the
-      moment someone adds `using UnityEngine;` to one of these files the test
-      build fails. That is the point: it makes "pure logic stays pure" a compile
-      error rather than a code-review convention.
+      Unity/BepInEx adapters are excluded by directory, so a stray UnityEngine
+      using in a pure folder still fails this build.
     -->
-    <Compile Include="../ChillFocused/Core/RuleText.cs" />
-    <Compile Include="../ChillFocused/Core/FocusSettings.cs" />
-    <Compile Include="../ChillFocused/Core/SessionGate.cs" />
-    <Compile Include="../ChillFocused/Core/PluginInfo.cs" />
-    <Compile Include="../ChillFocused/Core/PluginInstallCheck.cs" />
-    <Compile Include="../ChillFocused/Core/GameServices.cs" />
-    <Compile Include="../ChillFocused/Core/GameLanguageProbe.cs" />
-    <Compile Include="../ChillFocused/Core/FocusedProtocol.cs" />
-    <Compile Include="../ChillFocused/Core/HttpTransport.cs" />
-    <Compile Include="../ChillFocused/Core/HeadlessRunner.cs" />
-    <Compile Include="../ChillFocused/Core/TimerState.cs" />
-    <Compile Include="../ChillFocused/Core/HudMode.cs" />
-    <Compile Include="../ChillFocused/Core/PanelSpec.cs" />
-    <Compile Include="../ChillFocused/Core/TextFit.cs" />
-    <Compile Include="../ChillFocused/Core/OverlayText.cs" />
-    <Compile Include="../ChillFocused/Core/Toasts.cs" />
-    <Compile Include="../ChillFocused/Core/HudState.cs" />
-    <Compile Include="../ChillFocused/Core/OverlayLayout.cs" />
-    <Compile Include="../ChillFocused/Core/Hotkeys.cs" />
-    <Compile Include="../ChillFocused/Core/PanelText.cs" />
-    <Compile Include="../ChillFocused/Core/PanelStrings.cs" />
-    <Compile Include="../ChillFocused/Core/AppFilter.cs" />
-    <Compile Include="../ChillFocused/Core/RuleSync.cs" />
-    <Compile Include="../ChillFocused/Core/ConfigFile.cs" />
-    <Compile Include="../ChillFocused/Core/PanelSpecFile.cs" />
+    <Compile Include="../ChillFocused/Core/**/*.cs"
+             Exclude="../ChillFocused/Core/UI/Unity/**/*.cs;../ChillFocused/Core/Runtime/**/*.cs;../ChillFocused/Core/Platform/Unity/**/*.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -18,7 +18,7 @@ namespace ChillFocused.Tests
             "\"version\":\"0.1.0\",\"frozen_count\":2,\"frozen_total\":7," +
             "\"frozen_names\":[\"firefox\",\"vivaldi\"]," +
             "\"frozen_units\":[\"app-firefox-1.scope\",\"\"]," +
-            "\"recent_names\":[\"firefox\"],\"protect_count\":443," +
+            "\"recent_names\":[\"firefox\"],\"protect_count\":443,\"degraded\":true," +
             "\"delegated_source\":\"game-timer\"}";
 
         private static FocusStateResponse Parse(string json)
@@ -46,6 +46,7 @@ namespace ChillFocused.Tests
             Assert.Equal("app-firefox-1.scope", state.frozen_units[0]);
             Assert.Equal("firefox", state.recent_names[0]);
             Assert.Equal(443, state.protect_count);
+            Assert.True(state.degraded);
             Assert.Equal("game-timer", state.delegated_source);
         }
 

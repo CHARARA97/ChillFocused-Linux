@@ -47,11 +47,11 @@ echo "==> building ChillFocus plugin (net472, against the real game assemblies)"
 if dotnet restore "$ROOT/ChillFocused/ChillFocused.csproj" "${restore_args[@]}" >/dev/null \
    && dotnet build "$ROOT/ChillFocused/ChillFocused.csproj" --no-restore -v minimal; then
     echo
-    echo "artifact: $ROOT/plugin/ChillFocused/bin/Debug/net472/ChillFocused.dll"
+    echo "artifact: $ROOT/ChillFocused/bin/Debug/net472/ChillFocused.dll"
     echo "deploy:   scripts/install-bepinex.sh"
 else
     echo
     echo "The plugin build needs the game installed and discoverable." >&2
-    echo "Set CHILLFOCUS_GAME_DIR, or copy plugin/.env.props.example to plugin/.env.props." >&2
+    echo "Set CHILLFOCUS_GAME_DIR, or copy .env.props.example to .env.props." >&2
     exit 1
 fi

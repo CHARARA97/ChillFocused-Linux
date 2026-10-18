@@ -173,7 +173,7 @@ namespace ChillFocused.Tests
                 Build(server, "s3cret").Request("GET", "/api/v1/status", null);
                 Thread.Sleep(80);
 
-                Assert.Contains("X-ChillFocused-Token: s3cret", server.LastRequest);
+                Assert.Contains("X-Focused-Token: s3cret", server.LastRequest);
             }
 
             using (var server = new StubServer(Response(200, "OK", "{}")))
@@ -181,7 +181,7 @@ namespace ChillFocused.Tests
                 Build(server, string.Empty).Request("GET", "/api/v1/status", null);
                 Thread.Sleep(80);
 
-                Assert.DoesNotContain("X-ChillFocused-Token", server.LastRequest);
+                Assert.DoesNotContain("X-Focused-Token", server.LastRequest);
             }
         }
 

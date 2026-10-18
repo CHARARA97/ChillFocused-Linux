@@ -104,6 +104,38 @@ namespace ChillFocused.Tests
                 new FocusSettings { TimerFreshSeconds = 1f }.Validate()[0]);
         }
 
+        [Theory]
+        [InlineData("http://127.0.0.1:8766", true)]
+        [InlineData("http://localhost:8766", true)]
+        [InlineData("http://[::1]:8766", true)]
+        [InlineData("http://example.com:8766", false)]
+        [InlineData("not a url", false)]
+        public void IsLoopbackUrl_is_the_single_security_predicate(string url, bool expected)
+        {
+            Assert.Equal(expected, FocusSettings.IsLoopbackUrl(url));
+        }
+
+        [Theory]
+        [InlineData("http://127.0.0.1:8766")]
+        [InlineData("http://localhost:8766")]
+        [InlineData("http://[::1]:8766")]
+        public void Validate_accepts_loopback_backends(string url)
+        {
+            Assert.Empty(new FocusSettings { FocusedUrl = url }.Validate());
+        }
+
+        [Theory]
+        [InlineData("http://192.168.1.5:8766")]
+        [InlineData("http://example.com:8766")]
+        [InlineData("https://10.0.0.1:8766")]
+        [InlineData("not a url")]
+        public void Validate_rejects_non_loopback_backends(string url)
+        {
+            var problems = new FocusSettings { FocusedUrl = url }.Validate();
+
+            Assert.Contains(problems, problem => problem.Contains("loopback"));
+        }
+
         [Fact]
         public void RulesEqual_compares_only_the_rule_arrays()
         {

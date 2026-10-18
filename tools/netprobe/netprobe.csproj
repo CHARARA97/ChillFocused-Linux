@@ -36,7 +36,7 @@
       the exact code that ships in ChillFocused.dll rather than a re-implementation
       of it.
     -->
-    <Compile Include="../../plugin/ChillFocused/Core/HttpTransport.cs" />
+    <Compile Include="../../ChillFocused/Core/HttpTransport.cs" />
   </ItemGroup>
 
 </Project>

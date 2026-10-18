@@ -128,6 +128,33 @@ namespace ChillFocused.Tests
     }
 
     /// <summary>
+    /// The integer probe is used for Focused's pid, to notice a backend restart.
+    /// </summary>
+    public class ReadIntTests
+    {
+        [Fact]
+        public void Reads_a_pid_from_a_status_response()
+        {
+            Assert.Equal(4242, FocusStatusProbe.ReadInt("{\"ok\": true, \"pid\": 4242}", "pid"));
+        }
+
+        [Fact]
+        public void Missing_or_non_numeric_values_are_unknown()
+        {
+            Assert.Null(FocusStatusProbe.ReadInt("{\"ok\": true}", "pid"));
+            Assert.Null(FocusStatusProbe.ReadInt("{\"pid\": \"4242\"}", "pid"));
+            Assert.Null(FocusStatusProbe.ReadInt(null, "pid"));
+        }
+
+        [Fact]
+        public void A_key_used_as_a_substring_does_not_confuse_it()
+        {
+            Assert.Null(FocusStatusProbe.ReadInt("{\"other_pid\": 1}", "pid"));
+            Assert.Equal(2, FocusStatusProbe.ReadInt("{\"other_pid\": 1, \"pid\": 2}", "pid"));
+        }
+    }
+
+    /// <summary>
     /// Tests for the tiny boolean probe the sync thread uses instead of a real
     /// JSON parser. A miss must read as "unknown", never as "false".
     /// </summary>
@@ -139,16 +166,16 @@ namespace ChillFocused.Tests
             const string status =
                 "{\"ok\": true, \"enabled\": false, \"dry_run\": true, \"stats\": {\"scans\": 3}}";
 
-            Assert.True(HeadlessRunner.ReadBool(status, "ok"));
-            Assert.False(HeadlessRunner.ReadBool(status, "enabled"));
-            Assert.True(HeadlessRunner.ReadBool(status, "dry_run"));
+            Assert.True(FocusStatusProbe.ReadBool(status, "ok"));
+            Assert.False(FocusStatusProbe.ReadBool(status, "enabled"));
+            Assert.True(FocusStatusProbe.ReadBool(status, "dry_run"));
         }
 
         [Fact]
         public void Handles_the_compact_form()
         {
-            Assert.True(HeadlessRunner.ReadBool("{\"ok\":true}", "ok"));
-            Assert.False(HeadlessRunner.ReadBool("{\"enabled\":false}", "enabled"));
+            Assert.True(FocusStatusProbe.ReadBool("{\"ok\":true}", "ok"));
+            Assert.False(FocusStatusProbe.ReadBool("{\"enabled\":false}", "enabled"));
         }
 
         [Fact]
@@ -156,11 +183,11 @@ namespace ChillFocused.Tests
         {
             // "unknown" is important: the caller must not correct Focused
             // based on a field it failed to understand.
-            Assert.Null(HeadlessRunner.ReadBool("{\"ok\": true}", "enabled"));
-            Assert.Null(HeadlessRunner.ReadBool(string.Empty, "enabled"));
-            Assert.Null(HeadlessRunner.ReadBool(null, "enabled"));
-            Assert.Null(HeadlessRunner.ReadBool("{\"enabled\": null}", "enabled"));
-            Assert.Null(HeadlessRunner.ReadBool("{\"enabled\": 1}", "enabled"));
+            Assert.Null(FocusStatusProbe.ReadBool("{\"ok\": true}", "enabled"));
+            Assert.Null(FocusStatusProbe.ReadBool(string.Empty, "enabled"));
+            Assert.Null(FocusStatusProbe.ReadBool(null, "enabled"));
+            Assert.Null(FocusStatusProbe.ReadBool("{\"enabled\": null}", "enabled"));
+            Assert.Null(FocusStatusProbe.ReadBool("{\"enabled\": 1}", "enabled"));
         }
 
         [Fact]
@@ -168,14 +195,14 @@ namespace ChillFocused.Tests
         {
             // "enabled" also appears inside "disabled"; the quoted needle stops
             // that from matching.
-            Assert.Null(HeadlessRunner.ReadBool("{\"disabled\": true}", "enabled"));
-            Assert.True(HeadlessRunner.ReadBool("{\"disabled\": true, \"enabled\": true}", "enabled"));
+            Assert.Null(FocusStatusProbe.ReadBool("{\"disabled\": true}", "enabled"));
+            Assert.True(FocusStatusProbe.ReadBool("{\"disabled\": true, \"enabled\": true}", "enabled"));
         }
 
         [Fact]
         public void First_matching_key_wins()
         {
-            Assert.False(HeadlessRunner.ReadBool("{\"enabled\": false, \"enabled\": true}", "enabled"));
+            Assert.False(FocusStatusProbe.ReadBool("{\"enabled\": false, \"enabled\": true}", "enabled"));
         }
 
     }
